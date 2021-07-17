@@ -64,11 +64,13 @@
 	<script>
 		$(function(){
 			enviarPeticion('usuarios', 'consultar', {1:1}, function(res){
+				console.log(res)
 				for(let i = 0; i < res.datos.length; i++){
-					$('#contenido').append(`<tr>
+					$('#contenido').append(`<tr id = ${res.datos[i].id}>
 						<td>${res.datos[i].nombres}</td>
 						<td>${res.datos[i].correo}</td>
 						<td>${res.datos[i].telefono}</td>
+						<td><button class="btn btn-danger" onClick="borrar(${res.datos[i].id})">Borrar</button></td>
 					</tr>`)	
 				}
 			})
@@ -81,6 +83,12 @@
 				})
 			})
 		})
+
+		function borrar(id){
+			enviarPeticion('usuarios', 'eliminar', {id: id}, function(res){
+				$('#'+id).hide()
+			})
+		}
 	</script>
 </body>
 </html>
