@@ -16,6 +16,20 @@ class database extends mysqli {
 	}
 
 	public function ejecutarConsulta($query){
+		$respuesta = [];
 		$resultado = $this->query($query);
+		if(is_object($resultado)){
+			$respuesta['ejecuto'] = true;			
+			while($fila = $resultado->fetch_assoc()){
+				$respuesta['datos'][] = $fila;
+			}
+		}elseif($resultado == true){
+			$respuesta['ejecuto'] = true;
+		}else{
+			$respuesta['ejecuto'] = false;
+			$respuesta['error'] = $this->error;
+		}
+		$this->close();
+		return $respuesta;
 	}
 }

@@ -54,7 +54,7 @@
 							<th>Opciones</th>
 						</tr>
 					</thead>
-					<tbody></tbody>
+					<tbody id="contenido"></tbody>
 				</table>
 			</div>
 		</div>
@@ -63,9 +63,19 @@
 	<script src="../assets/main.js"></script>
 	<script>
 		$(function(){
+			enviarPeticion('usuarios', 'consultar', {1:1}, function(res){
+				for(let i = 0; i < res.datos.length; i++){
+					$('#contenido').append(`<tr>
+						<td>${res.datos[i].nombres}</td>
+						<td>${res.datos[i].correo}</td>
+						<td>${res.datos[i].telefono}</td>
+					</tr>`)	
+				}
+			})
+
 			$('#formulario').on('submit', function(event){
 				event.preventDefault()
-				let datos = parsearFormulario($(this))				
+				let datos = parsearFormulario($(this))
 				enviarPeticion('usuarios', 'insertar', datos, function(res){
 					console.log(res)
 				})
