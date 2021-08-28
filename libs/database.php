@@ -25,6 +25,7 @@ class database extends mysqli {
 			}
 		}elseif($resultado == true){
 			$respuesta['ejecuto'] = true;
+			$respuesta['insertId'] = $this->insert_id;
 		}else{
 			$respuesta['ejecuto'] = false;
 			$respuesta['error'] = $this->error;

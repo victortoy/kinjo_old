@@ -22,8 +22,7 @@ class usuarios{
 	}
 
 	public function eliminar($parametros){
-		$query = "DELETE FROM usuarios 
-				WHERE id = ".$parametros['id'];
+		$query = "DELETE FROM usuarios WHERE id = ".$parametros['id'];
 		$db = new database();
 		return $db->ejecutarConsulta($query);
 	}

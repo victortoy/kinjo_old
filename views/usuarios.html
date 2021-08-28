@@ -77,8 +77,13 @@
 			$('#formulario').on('submit', function(event){
 				event.preventDefault()
 				let datos = parsearFormulario($(this))
-				enviarPeticion('usuarios', 'insertar', datos, function(res){
-					console.log(res)
+				enviarPeticion('usuarios', 'insertar', datos, function(res){					
+					$('#contenido').append(`<tr id = ${res.insertId}>
+						<td>${datos.nombres}</td>
+						<td>${datos.correo}</td>
+						<td>${datos.telefono}</td>
+						<td><button class="btn btn-danger" onClick="borrar(${res.insertId})">Borrar</button></td>
+					</tr>`)
 				})
 			})
 		})

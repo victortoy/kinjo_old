@@ -9,7 +9,11 @@ function enviarPeticion(objeto, metodo, parametros, callback){
 		type: 'POST',
 		dataType: 'json',
 		success: function(respuesta){
-			callback(respuesta)
+			if(respuesta.ejecuto == true){
+				callback(respuesta)	
+			}else{
+				alert(respuesta.error)
+			}			
 		}
 	})
 }
