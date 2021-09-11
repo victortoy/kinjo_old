@@ -18,28 +18,28 @@
 						<div class="card-body">
 							<div class="mb-3">
 								<label class="form-label">Nombres</label>
-								<input type="text" name="nombres" class="form-control" required="required">
+								<input type="text" name="nombres" id="nombres" class="form-control" required="required">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">Apellidos</label>
-								<input type="text" name="apellidos" class="form-control" required="required">
+								<input type="text" name="apellidos" id="apellidos" class="form-control" required="required">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">Correo</label>
-								<input type="email" name="correo" class="form-control" required="required">
+								<input type="email" name="correo" id="correo" class="form-control" required="required">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">Teléfono</label>
-								<input type="number" name="telefono" class="form-control">
+								<input type="number" name="telefono" id="telefono" class="form-control">
 							</div>
 							<div class="mb-3">
 								<label class="form-label">Fecha nacimiento</label>
-								<input type="date" name="fn" class="form-control">
+								<input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control">
 							</div>
 						</div>
 						<div class="card-footer text-center">
-							<button type="submit" class="btn btn-primary">Guardar</button>
-							<button type="button" class="btn btn-secondary">Actualizar</button>
+							<button type="submit" class="btn btn-primary" id="botonGuardar">Guardar</button>
+							<button type="button" class="btn btn-secondary" id="botonActualizar">Actualizar</button>
 						</div>
 					</div>
 				</form>
@@ -62,14 +62,22 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	<script src="../assets/main.js"></script>
 	<script>
+		var id = 0
+
 		$(function(){
+			//Ocultar boton actualizar
+			$('#botonActualizar').hide()
+
 			enviarPeticion('usuarios', 'consultar', {1:1}, function(res){
 				for(let i = 0; i < res.datos.length; i++){
 					$('#contenido').append(`<tr id = ${res.datos[i].id}>
 						<td>${res.datos[i].nombres}</td>
 						<td>${res.datos[i].correo}</td>
 						<td>${res.datos[i].telefono}</td>
-						<td><button class="btn btn-danger" onClick="borrar(${res.datos[i].id})">Borrar</button></td>
+						<td>
+							<button class="btn btn-primary" onClick="editar(${res.datos[i].id})">Editar</button>
+							<button class="btn btn-danger" onClick="borrar(${res.datos[i].id})">Borrar</button>
+						</td>
 					</tr>`)	
 				}
 			})
@@ -82,11 +90,35 @@
 						<td>${datos.nombres}</td>
 						<td>${datos.correo}</td>
 						<td>${datos.telefono}</td>
-						<td><button class="btn btn-danger" onClick="borrar(${res.insertId})">Borrar</button></td>
+						<td>
+							<button class="btn btn-primary" onClick="editar(${res.insertId})">Editar</button>
+							<button class="btn btn-danger" onClick="borrar(${res.insertId})">Borrar</button>
+						</td>
 					</tr>`)
 				})
 			})
+
+			$('#botonActualizar').on('click', function(){
+				let datos = parsearFormulario($('#formulario'))
+				datos.id = id
+				console.log(datos)
+				enviarPeticion('usuarios', 'actualizar', datos, function(r){
+
+				})
+			})
 		})
+
+		function editar(idU){
+			id = idU
+			enviarPeticion('usuarios', 'consultarId', {id:idU}, function(r){
+				console.log(r)
+				for(let clave in r.datos[0]){
+					$('#'+clave).val(r.datos[0][clave])
+				}
+				$('#botonGuardar').hide()
+				$('#botonActualizar').show()	
+			})			
+		}
 
 		function borrar(id){
 			enviarPeticion('usuarios', 'eliminar', {id: id}, function(res){
