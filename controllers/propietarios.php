@@ -1,10 +1,6 @@
 <?php
-require '../libs/database.php';
+require '../libs/crud.php';
 
-class propietarios{
-	public function consultar($parametros){
-		$query = "SELECT * FROM propietarios";
-		$db = new database();
-		return $db->ejecutarConsulta($query);
-	}
+class propietarios extends crud{
+	protected $tabla = 'propietarios';
 }

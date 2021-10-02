@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+	<title>Propietarios</title>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  					Nuevo propietario
+				</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Nombre</th>
+						</tr>
+					</thead>
+					<tbody id="contenido"></tbody>
+				</table>
+			</div>
+		</div>
+		<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  			<div class="modal-dialog">
+    			<div class="modal-content">
+      				<div class="modal-header">
+        				<h5 class="modal-title" id="exampleModalLabel">Propietarios</h5>
+        				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      				</div>
+      				<div class="modal-body">
+        				<form id="formulario">
+							<div class="mb-3">
+								<label class="form-label">Nombres</label>
+								<input type="text" name="nombre" id="nombres" class="form-control" required="required">
+							</div>
+						</form>
+      				</div>
+      				<div class="modal-footer">
+        				<button type="submit" class="btn btn-primary" id="botonGuardar" form="formulario">Guardar</button>
+						<button type="button" class="btn btn-secondary" id="botonActualizar">Actualizar</button>
+      				</div>
+    			</div>
+  			</div>
+		</div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<script src="../assets/main.js"></script>
+	<script>
+		var id = 0
+		var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {
+  				keyboard: false
+			})
+
+		$(function(){
+			//Ocultar boton actualizar
+			$('#botonActualizar').hide()
+
+			//ConcultarTodos
+			consultarRegistros({1:1}, 'crear')
+
+			//Insert
+			$('#formulario').on('submit', function(event){
+				event.preventDefault()
+				let datos = parsearFormulario($(this))
+				enviarPeticion('propietarios', 'insertar', datos, function(res){
+					consultarRegistros({id: res.insertId}, 'crear')
+					myModal.hide()
+				})
+			})
+
+			$('#botonActualizar').on('click', function(){
+				let datos = parsearFormulario($('#formulario'))
+				datos.id = id
+				enviarPeticion('propietarios', 'actualizar', datos, function(r){
+					consultarRegistros({id: id}, 'actualizar')
+					myModal.hide()
+				})
+			})
+		})
+
+		function consultarRegistros(filtro, accion){
+			enviarPeticion('propietarios', 'consultar', filtro, function(res){
+				let fila = ''
+				for(let i = 0; i < res.datos.length; i++){
+					fila += `<tr id = ${res.datos[i].id}>
+								<td>${res.datos[i].nombre}</td>
+								<td>
+									<button class="btn btn-primary" onClick="editar(${res.datos[i].id})">Editar</button>
+									<button class="btn btn-danger" onClick="borrar(${res.datos[i].id})">Borrar</button>
+								</td>
+							</tr>`
+				}
+				if(accion == 'crear'){
+					$('#contenido').append(fila)
+				}else{
+					$('#'+res.datos[0].id).replaceWith(fila)
+				}
+			})
+		}
+
+		function editar(idU){
+			id = idU
+			enviarPeticion('propietarios', 'consultar', {id:idU}, function(r){
+				for(let clave in r.datos[0]){
+					$('#'+clave).val(r.datos[0][clave])
+				}
+				$('#botonGuardar').hide()
+				$('#botonActualizar').show()
+				myModal.show()
+			})			
+		}
+
+		function borrar(id){
+			enviarPeticion('propietarios', 'eliminar', {id: id}, function(res){
+				$('#'+id).hide()
+			})
+		}
+	</script>
+</body>
+</html>
